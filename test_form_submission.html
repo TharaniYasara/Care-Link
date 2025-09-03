@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Adoption Form Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background-color: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d3ff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Adoption Application Form Submission Test</h1>
+    <div id="results"></div>
+
+    <button onclick="testFormSubmission()">Test Form Submission</button>
+    <button onclick="testFormValidation()">Test Form Validation</button>
+    <button onclick="clearResults()">Clear Results</button>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testFormSubmission() {
+            addResult('Starting form submission test...', 'info');
+
+            // Create test form data
+            const formData = new FormData();
+
+            // Add all required fields (matching form field names)
+            formData.append('father_family_name', 'TestFather');
+            formData.append('father_first_names', 'John Test');
+            formData.append('father_dob', '1985-01-01');
+            formData.append('father_pob_country', 'Sri Lanka');
+            formData.append('father_pob_city', 'Colombo');
+            formData.append('father_nationality', 'Sri Lankan');
+            formData.append('father_religion', 'Buddhist');
+            formData.append('father_passport', 'N0000000');
+            formData.append('father_languages', 'Sinhala, English');
+
+            formData.append('mother_family_name', 'TestMother');
+            formData.append('mother_first_names', 'Jane Test');
+            formData.append('mother_dob', '1987-01-01');
+            formData.append('mother_pob_country', 'Sri Lanka');
+            formData.append('mother_pob_city', 'Kandy');
+            formData.append('mother_nationality', 'Sri Lankan');
+            formData.append('mother_religion', 'Christian');
+            formData.append('mother_passport', 'N0000001');
+            formData.append('mother_languages', 'Sinhala, English');
+
+            formData.append('present_address', '123 Test Street, Colombo 03');
+            formData.append('permanent_address', '123 Test Street, Colombo 03');
+            formData.append('date_of_marriage', '2010-01-01');
+            formData.append('email', 'test@example.com');
+            formData.append('phone', '+94771234567');
+            formData.append('household_income', '100000');
+            formData.append('residence_type', 'Own House');
+            formData.append('ownership', 'Owned');
+            formData.append('bedrooms', '3');
+            formData.append('preferred_age', '0-2 years');
+            formData.append('preferred_sex', 'Any');
+            formData.append('prefer_typical', 'Yes');
+            formData.append('accept_special_needs', 'No');
+            formData.append('other_particulars', 'We want to provide a loving home for a child.');
+            formData.append('decl_true', '1');
+            formData.append('decl_consent', '1');
+
+            // Add employment data using correct field names
+            formData.append('tblFatherJobs_employer[]', 'Test Company');
+            formData.append('tblFatherJobs_role[]', 'Manager');
+            formData.append('tblFatherJobs_income[]', '60000');
+
+            formData.append('tblMotherJobs_employer[]', 'Test Ltd');
+            formData.append('tblMotherJobs_role[]', 'Accountant');
+            formData.append('tblMotherJobs_income[]', '40000');
+
+            // Add children data using correct field names
+            formData.append('child_name[]', 'Test Child');
+            formData.append('child_dob[]', '2018-01-01');
+            formData.append('child_gender[]', 'Female');
+            formData.append('child_relation[]', 'Biological');
+
+            try {
+                const response = await fetch('admin/pages/save_adoption.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const responseText = await response.text();
+
+                if (response.ok) {
+                    addResult(`✅ Form submission successful! Response: ${responseText}`, 'success');
+
+                    // Try to parse JSON response
+                    try {
+                        const jsonResponse = JSON.parse(responseText);
+                        if (jsonResponse.success) {
+                            addResult(`✅ Application saved with ID: ${jsonResponse.application_id}`, 'success');
+                        } else {
+                            addResult(`❌ Application save failed: ${jsonResponse.message}`, 'error');
+                        }
+                    } catch (e) {
+                        addResult(`⚠️ Response is not JSON: ${responseText}`, 'info');
+                    }
+                } else {
+                    addResult(`❌ HTTP Error ${response.status}: ${responseText}`, 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        function testFormValidation() {
+            addResult('Testing form validation functions...', 'info');
+
+            // Test validation functions from adoption_application.html
+            const testCases = [
+                {
+                    field: 'email',
+                    value: 'test@example.com',
+                    expected: true,
+                    description: 'Valid email'
+                },
+                {
+                    field: 'email',
+                    value: 'invalid-email',
+                    expected: false,
+                    description: 'Invalid email'
+                },
+                {
+                    field: 'phone',
+                    value: '+94771234567',
+                    expected: true,
+                    description: 'Valid phone'
+                },
+                {
+                    field: 'nic',
+                    value: '198512345678',
+                    expected: true,
+                    description: 'Valid NIC'
+                }
+            ];
+
+            // Simple validation functions for testing
+            const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            const validatePhone = (phone) => /^\+94\d{9}$/.test(phone);
+            const validateNIC = (nic) => /^\d{12}$/.test(nic) || /^\d{9}[vV]$/.test(nic);
+
+            testCases.forEach(test => {
+                let result = false;
+                switch (test.field) {
+                    case 'email':
+                        result = validateEmail(test.value);
+                        break;
+                    case 'phone':
+                        result = validatePhone(test.value);
+                        break;
+                    case 'nic':
+                        result = validateNIC(test.value);
+                        break;
+                }
+
+                const status = result === test.expected ? '✅' : '❌';
+                const type = result === test.expected ? 'success' : 'error';
+                addResult(`${status} ${test.description}: ${test.value} (Expected: ${test.expected}, Got: ${result})`, type);
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Adoption Application Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background-color: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d3ff;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .test-links {
+            margin: 20px 0;
+        }
+
+        .test-links a {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .test-links a:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 Complete Adoption Application System Test</h1>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="testDatabaseConnection()">💾 Test Database Connection</button>
+        <button onclick="testFormSubmission()">📝 Test Form Submission</button>
+        <button onclick="testAdminInterface()">👨‍💼 Test Admin Interface</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Quick Links</h2>
+        <div class="test-links">
+            <a href="admin/pages/adoption_application.html" target="_blank">📄 Adoption Application Form</a>
+            <a href="admin/pages/adoption_applications.php" target="_blank">📋 Admin: View Applications</a>
+            <a href="test_adoption_submission.php" target="_blank">🔍 Database Test Script</a>
+        </div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testDatabaseConnection() {
+            addResult('🔍 Testing database connection...', 'info');
+
+            try {
+                const response = await fetch('test_adoption_submission.php');
+                const text = await response.text();
+
+                if (response.ok) {
+                    if (text.includes('✅ Database connection successful')) {
+                        addResult('✅ Database connection test passed', 'success');
+                    } else {
+                        addResult('❌ Database connection issues detected', 'error');
+                    }
+
+                    // Check for table existence
+                    if (text.includes("Table 'adoption_application' exists")) {
+                        addResult('✅ All database tables exist', 'success');
+                    } else {
+                        addResult('⚠️ Some database tables may be missing', 'warning');
+                    }
+                } else {
+                    addResult('❌ Failed to run database test', 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Database connection test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFormSubmission() {
+            addResult('📝 Testing form submission with realistic data...', 'info');
+
+            const formData = new FormData();
+
+            // Add comprehensive test data
+            formData.append('father_family_name', 'Perera');
+            formData.append('father_first_names', 'Sunil Kumar');
+            formData.append('father_dob', '1985-03-15');
+            formData.append('father_pob_country', 'Sri Lanka');
+            formData.append('father_pob_city', 'Colombo');
+            formData.append('father_nationality', 'Sri Lankan');
+            formData.append('father_religion', 'Buddhist');
+            formData.append('father_passport', 'N1234567');
+            formData.append('father_languages', 'Sinhala, English, Tamil');
+
+            formData.append('mother_family_name', 'Silva');
+            formData.append('mother_first_names', 'Kamala Devi');
+            formData.append('mother_dob', '1987-07-22');
+            formData.append('mother_pob_country', 'Sri Lanka');
+            formData.append('mother_pob_city', 'Kandy');
+            formData.append('mother_nationality', 'Sri Lankan');
+            formData.append('mother_religion', 'Buddhist');
+            formData.append('mother_passport', 'N1234568');
+            formData.append('mother_languages', 'Sinhala, English');
+
+            formData.append('present_address', '145/2A, Galle Road, Mount Lavinia, Colombo');
+            formData.append('permanent_address', '145/2A, Galle Road, Mount Lavinia, Colombo');
+            formData.append('date_of_marriage', '2012-02-14');
+            formData.append('email', 'sunil.kamala@example.com');
+            formData.append('phone', '+94771234567');
+            formData.append('household_income', '185000');
+            formData.append('residence_type', 'Own House');
+            formData.append('ownership', 'Owned');
+            formData.append('bedrooms', '4');
+            formData.append('assets', 'House, Car, Bank Savings');
+            formData.append('debts', 'Home Loan - LKR 2,500,000');
+            formData.append('preferred_age', '0-3 years');
+            formData.append('preferred_sex', 'Any');
+            formData.append('prefer_typical', 'Yes');
+            formData.append('accept_special_needs', 'Yes');
+            formData.append('special_age', '0-5 years');
+            formData.append('special_sex', 'Any');
+            formData.append('health_conditions', 'Both parents in good health');
+            formData.append('marriage_history', 'First marriage for both');
+            formData.append('other_particulars', 'We have been trying to conceive for 8 years and would love to provide a loving home for a child in need.');
+            formData.append('decl_true', '1');
+            formData.append('decl_consent', '1');
+
+            // Employment data
+            formData.append('tblFatherJobs_employer[]', 'Ceylon Bank PLC');
+            formData.append('tblFatherJobs_role[]', 'Senior Manager - Operations');
+            formData.append('tblFatherJobs_income[]', '120000');
+
+            formData.append('tblMotherJobs_employer[]', 'Ministry of Education');
+            formData.append('tblMotherJobs_role[]', 'Principal - Grade I School');
+            formData.append('tblMotherJobs_income[]', '65000');
+
+            // No children in this case as they are applying for adoption
+
+            try {
+                const response = await fetch('admin/pages/save_adoption.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const responseText = await response.text();
+
+                if (response.ok) {
+                    if (responseText.includes('Application saved')) {
+                        addResult('✅ Form submission successful!', 'success');
+
+                        // Extract application ID if possible
+                        const idMatch = responseText.match(/Reference ID: <strong>#(\d+)<\/strong>/);
+                        if (idMatch) {
+                            const appId = idMatch[1];
+                            addResult(`✅ Application saved with ID: ${appId}`, 'success');
+                            addResult(`📋 <a href="admin/pages/view_adoption_application.php?id=${appId}" target="_blank">View Application Details</a>`, 'info');
+                        }
+                    } else if (responseText.includes('Error:')) {
+                        addResult(`❌ Form submission failed: ${responseText}`, 'error');
+                    } else {
+                        addResult(`⚠️ Unexpected response: ${responseText.substring(0, 200)}...`, 'warning');
+                    }
+                } else {
+                    addResult(`❌ HTTP Error ${response.status}: ${responseText}`, 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Form submission failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminInterface() {
+            addResult('👨‍💼 Testing admin interface accessibility...', 'info');
+
+            try {
+                // Test admin applications page
+                const response = await fetch('admin/pages/adoption_applications.php');
+                if (response.ok) {
+                    addResult('✅ Admin applications page accessible', 'success');
+                } else if (response.status === 302) {
+                    addResult('⚠️ Admin page requires authentication (redirected)', 'warning');
+                } else {
+                    addResult(`❌ Admin page error: ${response.status}`, 'error');
+                }
+
+                // Test form page
+                const formResponse = await fetch('admin/pages/adoption_application.html');
+                if (formResponse.ok) {
+                    addResult('✅ Application form page accessible', 'success');
+                } else {
+                    addResult(`❌ Form page error: ${formResponse.status}`, 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Admin interface test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            addResult('🚀 Starting comprehensive adoption application system test...', 'info');
+            addResult('═══════════════════════════════════════════════════════════════', 'info');
+
+            await testDatabaseConnection();
+            addResult('─────────────────────────────────────────────────────────────', 'info');
+
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            await testFormSubmission();
+            addResult('─────────────────────────────────────────────────────────────', 'info');
+
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            await testAdminInterface();
+
+            addResult('═══════════════════════════════════════════════════════════════', 'info');
+            addResult('🏁 All tests completed! Check results above.', 'info');
+        }
+
+        // Auto-run basic tests when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            addResult('🌟 Adoption Application Test Suite Loaded', 'info');
+            addResult('Click "Run All Tests" to begin comprehensive testing', 'info');
+        });
+    </script>
+</body>
+
+</html>
